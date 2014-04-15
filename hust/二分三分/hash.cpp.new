@@ -1,0 +1,22 @@
+#define HASHB 100007//2048
+struct HM {
+    typedef ll Datum; typedef vector<Datum> DV; DV b[HASHB];
+    u32 fnv_hash(Datum *k, int len) const {
+        uch *p = reinterpret_cast<uch*>(k);
+        u32 h = 2166136261U;
+        for (int i = 0; i < len; ++i) h = (h * 16777619U ) ^ p[i];
+        return h;
+    }
+    void add(Datum k) {
+        int i = fnv_hash(&k, sizeof(Datum)) % HASHB;
+        for (int j = 0, J = b[i].size(); j < J; ++j)
+            if (b[i][j] == k) return;
+        b[i].push_back(k);
+    }
+    bool get(Datum k) {
+        int i = fnv_hash(&k, sizeof(Datum)) % HASHB;
+        for (int j = 0, J = b[i].size(); j < J; ++j)
+            if (b[i][j] == k) return true;
+        return false;
+    }
+} hm;

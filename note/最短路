@@ -1,0 +1,13 @@
+
+
+“最短路最快的应该是dij+优先队列优化或者dij+堆排序，SPFA理论上很快o（ke）但实际并不一定不过spfa传说中有一个很NB用处就是处理带负权回路。”
+那SPFA+slf优化呢？ SPFA用栈比用队列更快。
+
+黄叔说最好手敲heap+dijkstra，这样比用STL的priority_queue更快。还有邻接表，手敲邻接表比vector快。
+用poj 3159来练以上两项吧，用vector绝对超时。
+
+http://blog.sina.com.cn/s/blog_717d944e0100oi2c.html
+
+
+
+

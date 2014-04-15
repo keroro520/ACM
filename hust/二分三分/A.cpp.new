@@ -1,0 +1,19 @@
+#include <stdio.h>
+int Q;
+long long calc(int x)
+{
+  long long tot = 1;
+  for(int i = 1; i <= x; i++) tot *= i;
+  return tot;
+}
+int main()
+{
+  for(int i = 1; i < 100; i++) printf("%d: %lld\n", i, calc(i));
+  int Cas = 0, cases;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%d", &Q);
+    printf("Case %d: %d\n", ++Cas, 5*Q);
+  }
+  return 0;
+}

@@ -1,0 +1,44 @@
+/*
+  01分数规划  二分三分
+  orz ... neko那混蛋，跟他想了几天，没搞头，然后刚才他突然说，“这不就是01规划嘛”
+  然后...然后真想揍他...
+  http://m.blog.csdn.net/blog/kksleric/7526239
+*/
+#include <algorithm>
+#include <stdio.h>
+#include <math.h>
+using namespace std;
+#define MAXN 20005
+#define EPS  1e-8
+struct Lession {
+  double p, m, k;
+  bool operator < (const Lession & b) const {
+    return k > b.k;
+  }
+} a[MAXN];
+int n, d;
+double calc(double x)
+{
+  for(int i = 0; i < n; i++) a[i].k = a[i].p - a[i].m*x;
+  sort(a, a+n);
+  double sum = 0;
+  for(int i = 0; i < d; i++) sum += a[i].k;
+  return sum;
+}
+int main()
+{
+  int cases, Cas = 0;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%d%d", &n, &d); d = n - d;
+    double l = 0, r = 1, mid;
+    for(int i = 0; i < n; i++) scanf("%lf%lf", &a[i].p, &a[i].m), r += a[i].p;
+    while(r - l > EPS) {
+      mid = (r + l) / 2;
+      if(calc(mid) > 0) l = mid;
+      else r = mid;
+    }
+    printf("Case %d: %.8f\n",++Cas, mid*100+EPS);
+  }
+  return 0;
+}

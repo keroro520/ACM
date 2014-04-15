@@ -1,0 +1,100 @@
+/*
+  二分三分  预处理  hash 判重  好题
+  考点是预处理...neko和fuyuchang用搜索50ms，我...500+ms =_= 还以为我用队列轮换搞会比较快，
+  但是map判重巨慢=_= 换了Leonardo B的hash，快了300ms !!! 果断收了hash table~
+
+  题意：lucky number是由4和7组成的数，very lucky number是由多个lucky number相乘的积，包括
+        lucky number在内，问A~B内有多少个very lucky number
+  思路：难点在预处理出所有very lucky number
+
+        fuyuchang和neko搜索不会，Leonardo B的的每一步都unique一遍来去重不优美，我写了个用
+        队列轮换搞+map/hash去重
+
+        方法是这样的，(1)先暴利预处理出lucky number.   不要用deque，会爆，还没到1000就爆了
+        (2)依旧暴利预处理出very lucky number ，只不过要判重
+*/
+#include <stdio.h>
+#include <algorithm>
+#include <map>
+#include <vector>
+using namespace std;
+typedef long long ll;
+typedef unsigned int  u32;
+typedef unsigned char uch;
+#define MAX_QUEUE   346375
+#define Limit       1000000000000LL
+map<ll, bool> M;
+ll lucky[MAX_QUEUE], Q[MAX_QUEUE];
+int lucky_head, Q_head;
+
+#define HASHB 100007//2048
+struct HM {
+    typedef ll Datum; typedef vector<Datum> DV; DV b[HASHB];
+    u32 fnv_hash(Datum *k, int len) const {
+        uch *p = reinterpret_cast<uch*>(k);
+        u32 h = 2166136261U;
+        for (int i = 0; i < len; ++i) h = (h * 16777619U ) ^ p[i];
+        return h;
+    }
+    void add(Datum k) {
+        int i = fnv_hash(&k, sizeof(Datum)) % HASHB;
+        for (int j = 0, J = b[i].size(); j < J; ++j)
+            if (b[i][j] == k) return;
+        b[i].push_back(k);
+    }
+    bool get(Datum k) {
+        int i = fnv_hash(&k, sizeof(Datum)) % HASHB;
+        for (int j = 0, J = b[i].size(); j < J; ++j)
+            if (b[i][j] == k) return true;
+        return false;
+    }
+} hm;
+
+void init()
+{
+  int head = 0, tail = 0;
+  int times = 12;
+  lucky[head++] = 0;
+  while(times--) {
+    int tmp_head = head;
+    for(; tail < tmp_head; tail++) {
+      if(lucky[tail] * 10 + 4 <= Limit) lucky[head++] = lucky[tail]*10 + 4;
+      if(lucky[tail] * 10 + 7 <= Limit) lucky[head++] = lucky[tail]*10 + 7;
+    }
+  }
+  lucky_head = head;
+  head = 0, tail = 0;
+  Q[head++] = 1;
+  while(true) {
+    int tmp_head = head;
+    if(tail == head) break;
+    for( ; tail < tmp_head; tail++) {
+      for(int i = 1; i < lucky_head; i++) {
+        ll x = lucky[i] * Q[tail];
+        if(x <= Limit) {
+          //if(!M[x]) M[x] = true, Q[head++] = x;
+          if(!hm.get(x)) hm.add(x), Q[head++] = x;
+        }
+        else break;
+      }
+    }
+  }
+
+  Q[0] = Limit + 4;
+  sort(Q, Q+head);
+  Q_head = head - 1;
+  //for(int i = 0; i < 14; i++) printf("! %lld\n", Q[i]);
+  //printf("# %d %d\n", Q_head, lucky_head);
+}
+int main()
+{
+  int cases, Cas = 0;
+  ll A, B;
+  init();
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%lld%lld", &A, &B);
+    printf("Case %d: %lld\n", ++Cas, upper_bound(Q, Q+Q_head, B) - upper_bound(Q, Q+Q_head, A-1));
+  }
+  return 0;
+}

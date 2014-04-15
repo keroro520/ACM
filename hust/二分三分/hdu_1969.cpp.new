@@ -1,0 +1,45 @@
+/*
+  二分三分 简单二分答案
+  Pi 最好用acos(-1.0)
+  精度要开到1e-7才能过，估计我哪里损失精度严重了，因为我看别人1e-6就能过。
+
+  ppt里教了一个好方法，先扩大半径100000再来搞，减少精度损失，mark.
+*/
+#include <stdio.h>
+#include <math.h>
+#include <algorithm>
+using namespace std;
+#define MAXN 10005
+#define EPS  1e-7
+#define Pi   (acos(-1.0))
+int F, n;
+double sz[MAXN];
+inline double Area(double r)
+{
+  return Pi * r * r;
+}
+bool check(double x)
+{
+  int sum = 0;
+  for(int i = 0; i < n; i++) sum += (int)(sz[i]/x);
+  return sum >= F;
+}
+int main()
+{
+  int cases;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%d%d", &n, &F), F++;
+    double max_size = 0;
+    for(int i = 0; i < n; i++)
+      scanf("%lf", &sz[i]), sz[i] = Area(sz[i]), max_size = max(max_size, sz[i]);
+    double l = 0, r = max_size, mid, ans = 0;
+    while( r - l > EPS ) {
+      mid = (l + r)/2;
+      if(check(mid)) ans = mid, l = mid;
+      else r = mid;
+    }
+    printf("%.4f\n", ans);
+  }
+  return 0;
+}

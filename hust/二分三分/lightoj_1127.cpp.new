@@ -1,0 +1,59 @@
+/*
+  二分三分 二分统计  二分搜索  好题  经典题  搜索剪枝
+
+  题意：给n(1<=n<=30)个数wi>=0, 取出若干个，要求和不超过W。问合法方案数。
+
+  思路：折半统计
+        把n个数分成两份，分别二进制枚举合法的情况(W >= sum)，分别存到两个堆里，其中一个堆
+        sort一遍。然后我们就可以枚举一个堆的状态ai，再在另一个堆里二分找出所有ai+bi<= W的
+        bi。  其实就是把a堆和b堆合并起来。
+
+        折半法把复杂度2^30直接降到2^15，太爽了，拒Neko说这是个套路题=_=  跟前两天我们讨论
+        那道“5个堆各取一个数，使之和为0”的题hdu_4334很像。
+
+
+        练习赛的时候neko和fubao用暴力搜索+剪枝过了...可我们拉的是二分三分专场呀=_=
+        剪枝有这么两个：
+          (1)sort，应该来说把大的放前面比较能减少冗余递归；
+          (2)dfs时发现后缀和加上当前sum都不超过W，则用组合数学算一下，就回溯，不前进了；
+          (3)当前sum == W，就退出。但是这个不能用在从大到小排序上，因为wi可以为0. 所以这个
+             剪枝慎用
+
+*/
+#include <algorithm>
+#include <stdio.h>
+using namespace std;
+typedef long long ll;
+int w[33], a[1 << 16], b[1 << 16];
+int n, W, na, nb;
+int solve()
+{
+  int half = n/2;
+  na = nb = 0;
+  for(int i = 0, oo = (1 << half); i < oo; i++) {   //前部分n/2
+    ll sum = 0;
+    for(int j = 0; j < half; j++) if((1 << j) & i) sum += w[j];
+    if(sum <= W) a[na++] = (int)sum;
+  }
+  for(int i = 0, oo = (1 << (n-half)); i < oo; i++) {//后部分n-n/2
+    ll sum = 0;
+    for(int j = 0; j < n-half; j++) if((1 << j) & i) sum += w[j+half];
+    if(sum <= W) b[nb++] = (int)sum;
+  }
+  sort(b, b+nb);
+  int ans = 0;
+  for(int i = 0; i < na; i++)
+    ans += upper_bound( b, b+nb, W-a[i] ) - b;    //合并  用二分
+  return ans;
+}
+int main()
+{
+  int Cas = 0, cases;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%d%d", &n, &W);
+    for(int i = 0; i < n; i++) scanf("%d", &w[i]);
+    printf("Case %d: %d\n", ++Cas, solve());
+  }
+  return 0;
+}

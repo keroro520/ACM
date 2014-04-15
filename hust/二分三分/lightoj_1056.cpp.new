@@ -1,0 +1,48 @@
+/*
+  二分三分  卡精度
+  题意：一个由一个矩形+两个相同弓形组成的操场，且这两个弓形是属于同一个圆。已知周长为400，
+        矩形长宽比，求矩形的长宽。
+  思路：既然两个弓形属于同一个圆，那么该圆心就是矩形的对角线交点
+        二分枚举矩形的长边l ，判断与400的大小关系就可以了。
+        说实话，我列出了式子，但不知道怎么判断它是凸函数还是单调函数=_= 怎么办=_=
+
+        卡精度，我是用周长 * 10000来搞的，再加个dblcmp()
+        弧的周长l = R * θ
+        l = n（圆心角）x π（圆周率）x r（半径）/180
+        l =α(圆心角弧度数)× r（半径）
+*/
+#include <algorithm>
+#include <math.h>
+#include <stdio.h>
+using namespace std;
+#define EPS 1e-8
+#define Pi ( acos(-1.0) )
+int a, b;
+const double perimeter = 400 * 10000;
+int dblcmp(double x) {
+  if(fabs(x) <= EPS) return 0;
+  return x > 0 ? 1 : -1;
+}
+double calc(double l)
+{
+  double h = b*l/a, r = sqrt(l*l+h*h)/2;
+  return l + r*2*atan(h/l) - perimeter/2;
+}
+int main()
+{
+  int cases, Cas = 0;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%d : %d", &a, &b);
+    double l = 0, r = perimeter / 2, mid;
+    while(r - l > EPS) {
+      mid = (r + l) / 2;
+      int res = dblcmp(calc(mid));
+      if(res == 0) break;
+      else if(res > 0) r = mid;
+      else l = mid;
+    }
+    printf("Case %d: %.8f %.8f\n", ++Cas, mid/10000, b*mid/a/10000);
+  }
+  return 0;
+}

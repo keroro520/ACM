@@ -1,0 +1,33 @@
+#include <math.h>
+#include <stdio.h>
+#define EPS 1e-9
+double L, n, C, theta;   //一半的圆心角
+int dblcmp(double x) {
+  if(fabs(x) <= EPS) return 0; return x > 0 ? 1 : -1;
+}
+double calc(double r)
+{
+  theta = asin( L/2/r );
+  return r*theta*2 - C;
+}
+int main()
+{
+  int cases, Cas = 0;
+  scanf("%d", &cases);
+  while(cases--) {
+    theta = 0;
+    scanf("%lf%lf%lf", &L, &n, &C);
+    C = (1 + n*C)*L;  //弧长
+    double l = 0, r = 1000, mid = 0, midmid = 0;
+    while(r - l > EPS) {
+      double t = (r - l) / 3;
+      mid = l + t;
+      midmid = r - t;
+      if(calc(mid) > calc(midmid)) r = midmid;
+      else l = mid;
+    }
+    double h = mid - mid*cos(theta);
+    printf("Case %d: %.8f\n", ++Cas, h);
+  }
+  return 0;
+}

@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <algorithm>
+#include <limits.h>
+using namespace std;
+#define		MAXN		20005
+int a[MAXN], b[MAXN], c[MAXN];
+int n;
+bool check(long long mid)
+{
+	long long sum = 0;
+	for(int i = 1; i <= n; i++) {
+		int std = min((int)mid, b[i]);
+		if(std >= a[i]) sum += 1 + (std-a[i])/c[i];
+	}
+	return (sum & 1LL);
+}
+int main()
+{
+	while(scanf("%d", &n) != EOF) {
+		for(int i = 1; i <= n; i++) scanf("%d%d%d", &a[i], &b[i], &c[i]);
+		long long l = 0, r = ((long long)INT_MAX+1), ans=-1, mid;
+		while(l <= r) {
+			mid = (l + r) / 2;
+			if(check(mid)) ans = mid, r = mid - 1;
+			else l = mid + 1;
+		}
+		if(ans == -1) {
+			puts("DC Qiang is unhappy.");
+			continue;
+		}
+		long long sum = 0;
+		for(int i = 1; i <= n; i++) {
+			if(ans >= a[i] && ans <= b[i] && (ans-a[i])%c[i] == 0) sum ++;
+		}
+		printf("%I64d %I64d\n", ans, sum);
+	}
+	return 0;
+}

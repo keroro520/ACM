@@ -1,0 +1,85 @@
+/*
+  卡特兰数　+ 乘法逆元 + 二分三分  扩展欧几里得   好题
+  题意：给a, b (1 <= a <= b <= 10^10)，设a，b之间有n个完全数[x>1,y>1，使得m=x^y，则m为完全
+        数，用这n个数作为结点，求这n个结点能形成多少种二叉树？
+
+  思路：第一次用乘法逆元 ~~ 乘法逆元有可能为负数，要记得 (inv % MOD + MOD) % MOD  !!!
+        catalan number : 1, 1, 2, 5, ...  不过这里n=0, ans=0
++
+摘：
+乘法逆元：
+x*y ≡ 1mod (mod)，则称 x 是 y 对于mod的乘法逆元
+分数取模就要用到了，因为上面递推式有分母i+1
+要求(i+1)^-1 % mod = ?
+就等价于i+1的逆元x%mod了
+令y = i+1，x*y ≡ 1mod (mod) → x*y + k*mod == 1
+用扩展欧几里德即可算出y的逆元x
+
+扩展欧几里得：http://972169909-qq-com.iteye.com/blog/1140914
+最后二分查找a，b之间有多少个完全数
+*/
+#include <stdio.h>
+#include <algorithm>
+using namespace std;
+typedef long long ll;
+#define MAXN 1000006
+#define MOD  100000007
+//h(n)=h(n-1)*(4*n-2)/(n+1);
+ll cat[MAXN], p[MAXN];
+int n;
+void Egcd (ll a, ll b, ll &x, ll &y)    //扩展欧几里德
+{
+    if (b == 0)
+    {
+        x = 1;
+        y = 0;
+        return ;
+    }
+    Egcd (b, a%b, x, y);
+    ll tp = x;
+    x = y;
+    y = tp - a/b*y;
+}
+ll mod_inv(ll a)
+{
+  ll x, y;
+  Egcd(a, MOD, x, y);
+  return x;
+}
+void init()
+{
+  cat[0] = 0, cat[1] = 1;
+  for(int i = 2; i < 1000005; i++) {
+    cat[i] = (cat[i-1]*(4*i-2) % MOD * ((mod_inv(i+1)%MOD+MOD)%MOD)) % MOD; //!!!
+  }
+
+  n = 0;
+  for(ll i = 2; i < 100000; i++) {
+    ll j = i*i;
+    while(j <= 10000000000LL) {
+      p[n++] = j;
+      j *= i;
+    }
+  }
+  sort(p, p+n);
+  int idx = n; n = 1;
+  for(int i = 1; i < idx; i++) if(p[i] != p[i-1]) p[n++] = p[i];
+}
+ll Catalan(int num)
+{
+  return cat[num];
+}
+int main()
+{
+  int cases, Cas = 0;
+  ll l, r;
+  init();
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%lld%lld", &l, &r);
+    int num = upper_bound(p, p+n, r) - upper_bound(p, p+n, l-1);
+//printf("! %d  ",num);
+    printf("Case %d: %lld\n", ++Cas, Catalan(num) % MOD);
+  }
+  return 0;
+}

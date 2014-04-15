@@ -1,0 +1,26 @@
+/*
+  相似三角形
+  为什么会出现在二分三分专题里？？
+  记一下相似三角形的性质：
+    对应角相等
+    对应边，对应高成比例（称为相似比）
+    周长成比例（等于相似比）
+    面积成比例（相似比的平方）
+*/
+#include <stdio.h>
+#include <math.h>
+
+int main()
+{
+  int cases, Cas = 0;
+  double AB, AC, BC, k1, k2, AD;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%lf%lf%lf", &AB, &AC, &BC);
+    scanf("%lf", &k1);
+    k2 = (1+k1)/k1;
+    AD = AB/sqrt(k2);
+    printf("Case %d: %.9f\n", ++Cas, AD);
+  }
+  return 0;
+}

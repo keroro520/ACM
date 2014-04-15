@@ -1,0 +1,95 @@
+
+hdu 2377 最短路
+题意：终点集合到s的最远距离最短，求s.    即已知终点集{d}求一s使得Min{ max{ dis(s, di) } }
+
+思路：  多次单源最短路，选出最大值
+        在对每个x进行分层搜索的过程中, 用max_d[y]记录每个地区x>到达地区y的最短距离中的最大值. 最后求得的Star Value就是max_d[]中的>最小值
+        由于题目的特殊性`边权都为1`，所以可以借助这一性质变换一下SPFA使其更快。
+void SPFA(int s, int when)
+{
+    deque<int> Q[2];
+    int cur = 0;
+    Q[cur].push_back(s);
+    max_d[s] = max(max_d[s], 1);
+    visit[s] = when;
+    int floors = 1;
+    do {
+        floors++;
+        while(!Q[cur].empty()) {
+            int at = Q[cur].front();
+            Q[cur].pop_front();
+            for(int Size = v[at].size(), i = 0; i < Size; i++) {
+                int to = v[at][i];
+                if(visit[to] != when) {     //是否已入队
+                    //max_d[to] = max(max_d[to], max_d[at]+1);      这句是不对的，因为这个分层跟拓扑排序的分层是不一样的，拓扑排序是要在
+入度为0时才能加进队Q，所以可以这样写，但是这里只要第一次遇见点to就必须得入队，因为要的是最短路径
+                    max_d[to] = max(max_d[to], floors); //不把这句放在if外面，因为这里的max_d[to]是距离s的最短路径，最短路径也就是最小层
+数，最小层数在to第一次入队的时候已经得到了
+                    visit[to] = when;
+                    Q[1-cur].push_back(to);
+                }
+            }
+        }
+        cur = 1 - cur;
+    } while(!Q[cur].empty());
+}
+
+hdu 2433 最短路
+题意：给出边建图，然后分别删除各条边，问每一次删边后的所有端点的两两最短路之和，若有一对端点不连通，则返回INF
+
+思路：暴力解法是每次删边后都来n次最短路。这里面的冗余就是删除的边并不影响一些点的最短路树，所以这些点可以不用在删边后都来次dijkstra>。标程解法就是在暴力解法上加上一些剪枝。先预处理出所有点的最短路树，记x的最短路树的和为sum[x]。现在来去掉冗余：在预处理时用used[x][u][v]记录点x的最短路树是否用到了边u--v，则删除边u--v的时候，判断点x的最短路树是否用到边u--v的，若用到，则对x做一次dijkstra，用新的sum[x]表示>当前最短路树；否则用预处理的sum[x]就可以，不用再dijkstra.
+    这道题有很多重边，这估计也是考点之一，不好好处理重边的话会超时。如果有重边<u,v>的话，删<u,v>跟不删没什么区别，所以可以直接跳过。
+    网上很多题解是错的，只是数据水才过得了。
+
+hdu 2383 最短路
+题意：给定两对{s,t}，问这两条最短路上的最多公共点数。
+
+思路：题解说“容易验证相交公共点连续“，可是我没尝试证过。。
+我们用dp[i][j] 代表 从点i到点j最短路上最多有多少个点！ 那么 map[s1][i]+map[i][j]+map[j][e1]=map[s1][e1] 不就表示i到j的最短路为 s1到e1最短路的子路嘛； 我们只需更新dp[i][j]中的最大值即可 
+用的是floyd
+        for(int k = 1; k <= n; k++)
+            for(int i = 1; i <= n; i++) if(i != k)
+                for(int j = 1; j <= n; j++) if(j != i && j != k) {
+                    if(map[i][j] > map[i][k] + map[k][j]) {
+                        map[i][j] = map[i][k] + map[k][j];
+                        dp[i][j]  = dp[i][k] + dp[k][j] - 1;
+                    } else if(map[i][j] == map[i][k] + map[k][j] && dp[i][j] < dp[i][k] + dp[k][j] - 1) {
+                        dp[i][j] = dp[i][k] + dp[k][j] - 1;
+                    }
+                }
+        scanf("%d%d%d%d", &s1,&t1,&s2,&t2);
+        int ans = 0;
+        for(int i = 1; i <= n; i++)
+            for(int j = 1; j <= n; j++)
+                if(map[s1][i] + map[i][j] + map[j][t1] == map[s1][t1] &&
+                   map[s2][i] + map[i][j] + map[j][t2] == map[s2][t2])
+                        if(ans < dp[i][j]) ans = dp[i][j];
+摘抄：   显然，两条最短路径里面公共的那部分子路径一定是连续的（如果一定要间断的话，那么说明有更短的路径）。
+
+poj 2249     K最短路
+在这求第  k 短路用的是，A*+dij 所谓的A* 是一种启发式搜索，他给搜索选定一定的方向，避免了，无谓的搜索，如何来确定搜索的顺序？..也就是用一个值来表示这个值为f[x]..每次搜索取f[x]最小的拓展...那么这个f[x]=h[x]+g[x]其中这个h[x]就是当前搜索时的代价..如求K段路这个就是前一个点的h[x']+边的长度...而g[x]是一个估价函数..估价函数要小于是对当前点到目标的代价的估计..这个估计必须小于等于实际值~~否则会出错...A*的关键也就是构造g[x]..，我们的dij 算法。最短路是，就是一种 A* 搜索，其中 g[x]=0;
+而这里要说的求K短路一种方法..就是用BFS+A*来搜索的过程...g[x]的设定为到这个点到目标点的最短路（这个可以用dij 一次求出） 径...显然其实小于等于实际值的...h[x]就是搜索到这个点的代价（及走过的路程）..用一个优先队列来做..每次取出h[x]+g[x]最小的点来拓展...拓展 也就是通过这点来更新其能直接经过一条边到达的点..这里做好一个新点就丢进优先队列里去..反正总会从对首弹出h[x]+g[x]最小的点..
+首先，我们在放优先队列的是这样的节点，他包括，从原点 到达本节点 的路径长度  len ，然后我们在优先列里，按照 len +dis[i] （dis 到达终点的最最短路）的最小，优先级 排队，
+那么当我们第一次搜索到 E 点时，这时肯定是 最短路径，第二次取出的，就是第二短路，以此类推
+int A_star(int start, int end)
+{
+    memset(times, 0, sizeof(times));
+    priority_queue<KNode> Q;
+    while(!Q.empty()) Q.pop();
+    Q.push(KNode(start, 0));
+    while(!Q.empty()) {
+        KNode now = Q.top();
+        Q.pop();
+        int u = now.u;
+        int len = now.len;
+        times[u]++;
+        if(times[end] == K) return len;
+        if(times[u] > K) continue;  //
+        for(int Size = v[u].size(), i = 0; i < Size; i++) {
+            int tmp = v[u][i];
+            Q.push(KNode(tmp, len+e[u][i]));
+        }
+    }
+    return -1;
+}
+

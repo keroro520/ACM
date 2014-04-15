@@ -1,0 +1,67 @@
+/*
+  二分三分
+  题意：如图，给出x，y，c，求问号处的长度
+
+  思路：我是用二分 + 计算几何求交点来做的，做法很多，有什么用相似之类的，不会
+        二分枚举w，然后列出c的方程，易知满足单调性
+*/
+#include <algorithm>
+#include <math.h>
+#include <stdio.h>
+using namespace std;
+#define EPS 1e-9
+class Point {
+  public : double x, y;
+  Point () {}
+  Point (double x, double y) : x(x), y(y) {}
+  Point operator - (const Point &b) const {
+    return Point(x-b.x, y-b.y);
+  }
+  Point operator + (const Point &b) const {
+    return Point(x+b.x, y+b.y);
+  }
+  Point operator * (const double t) {
+    return Point(x*t, y*t);
+  }
+} ;
+double x, y, c;
+
+int dblcmp(double x) {
+  if(fabs(x) <= EPS) return 0; return x > 0 ? 1 : -1;
+}
+double xmulti(const Point &a, const Point &b) {
+  return a.x*b.y - a.y*b.x;
+}
+Point intersection(const Point &a, const Point &b, const Point &c, const Point &d)
+{
+  //lrj书上是inter(P, u, Q, v)，其中P，u分别是第一条直线的一个点和方向向量，这里我用b-a就得到u了
+  Point u = b-a, v = d - c;   //u,v是两条直线的方向向量
+  Point tmp = a - c;
+  double t = xmulti(v, tmp)/xmulti(u, v);
+  return a + u*t;
+}
+double calc(double w)
+{
+  double a = sqrt(x*x-w*w), b = sqrt(y*y-w*w);
+  Point in = intersection( Point(0, a), Point(w, 0), Point(0, 0), Point(w, b) );
+  return in.y - c;
+}
+int main()
+{
+  freopen("in.txt","r",stdin);
+  int cases, Cas = 0;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%lf%lf%lf", &x, &y, &c);
+    double l = 0, r = min(x, y), mid;
+    while(r - l > EPS) {
+      mid = (l + r) / 2;
+      int res = dblcmp( calc(mid) );
+      if(res == 0) break;
+      else if(res > 0) l = mid;
+      else r = mid;
+    }
+    printf("Case %d: %.9f\n", ++Cas, mid);
+  }
+  return 0;
+}

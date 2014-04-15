@@ -1,0 +1,21 @@
+/*
+  补三角知识：
+  sin(Pi/n) = r/(R-r)
+      ->  r = R*sin(Pi/n) / (1+sin(Pi/n))
+  画个图，R-r就是大圆心到小圆心的距离，做小圆切线l交于大圆心，再做小圆心到l的垂线，就会发现
+  sin(Pi/n) = r/(R-r)
+*/
+#include <math.h>
+#include <stdio.h>
+#define Pi ( acos(-1.0) )
+int main()
+{
+  int cases, Cas = 0, n; double R;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%lf%d", &R, &n);
+    double r = R * sin(Pi/n) / (1 + sin(Pi/n));
+    printf("Case %d: %.8f\n", ++Cas, r);
+  }
+  return 0;
+}

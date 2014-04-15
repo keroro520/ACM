@@ -1,0 +1,34 @@
+/*
+  二分三分
+  摘:
+  本题要求影子最长的长度。
+  在灯、人头、墙角成一条直线时影子长为a,在人到达墙角时影子长为b，我们可以写出人在这两点间时
+  影子的方程：(x*H-D*h)/(x-D)+x，有数学知识可知这个方程在[a,b]之间是凸的，即先增加后减小，
+  有极值，可以用三分法高效求解，x是人距离墙的水平距离。
+
+  虽然能搞出上面的公式，但我还是看不出来它在[a,b]上是凸函数...求解?
+*/
+#include <stdio.h>
+#define EPS 1e-7
+double H, h, D;
+double calc(double x)
+{
+  return (D*h - x*H)/(D - x) + x;
+}
+int main()
+{
+  int cases;
+  scanf("%d", &cases);
+  while(cases--) {
+    scanf("%lf%lf%lf", &H, &h, &D);
+    double l = 0, r = D*h/H, mid, midmid;
+    while(r - l > EPS) {
+      mid = (l + r) / 2;
+      midmid = (r + mid) / 2;
+      if(calc(mid) > calc(midmid)) r = midmid;
+      else l = mid;
+    }
+    printf("%.3f\n", calc(l));
+  }
+  return 0;
+}

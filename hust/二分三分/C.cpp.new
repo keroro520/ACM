@@ -1,0 +1,43 @@
+// 最小树形图
+#include <algorithm>
+#include <string.h>
+#include <stdio.h>
+
+struct Edge {
+  int u, v, b, c;
+} edge[MAXM*2];
+bool check(int mid)
+{
+  memset(vis, false, sizeof(vis));
+  memset(dis, 127, sizeof(dis));
+  dis[0] = 0;
+  for(int i = 1; i < n; i++) {
+    int _min = 999999999, _min_i = -1;
+    for(int i = 1; i < n; i++) if(!vis[i] && dis[i] < _min) {
+      _min = dis[i], _min_i = i;
+    }
+    if(
+}
+int main()
+{
+  int cases, Cas = 0;
+  scanf("%d", &cases);
+  while(cases--) {
+    int l = 0, r = 0, u, v, b, c;
+    memset(head,-1, sizeof(head));   edge_num = 0;
+    scanf("%d%d%d", &n, &m, &C);
+    for(int i = 0; i < m; i++) {
+      scanf("%d%d%d%d", &u, &v, &b, &c);
+      add_edge(u, v, b, c);
+      r = max(r, b);
+    }
+    int ans = 0, mid;
+    while(l <= r) {
+      mid = (l + r) >> 1;
+      if(check(mid)) ans = mid, l = mid + 1;
+      else r = mid - 1;
+    }
+    printf("Case %d: %d\n", ++Cas, ans);
+  }
+  return 0;
+}

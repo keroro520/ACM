@@ -1,0 +1,14 @@
+1 5
+push 3
+push 2
+pop
+push 4
+pop
+
+
+output:
+    2
+    4
+
+
+
