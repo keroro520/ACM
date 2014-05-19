@@ -12,17 +12,19 @@ int main()
 	int cases = 10;
 	while(cases--) {
 
-	    int n = rand() % 5 + 1;
-    	int m = rand() % 10;
-		int money = rand() % 20;
-	    cout << endl << endl << n << " " << m << endl;
-    	for(int i = 0; i < n; i++) {
-        	int x = rand() % 3+1 ;
-        	int y = rand() % 3 ;
-        	cout << x << " " << y << endl;
-			for(int j = 0; j < x; j++) printf("%d %d\n", rand()%10, rand()%10);
+	    int n = rand() % 1000;
+    	int m = rand() % (2*n);
+	    cout <<  n << " " << m << endl;
+    	for(int i = 0; i < m; i++) {
+        	int x = rand() % n ;
+        	int y = rand() % n ;
+        	if (x == y) { i--; continue; }
+			else cout << x << " " << y << endl;
+
 		}
+		cout << endl ;
     }
+	puts("0 0");
 
     return 0;
 }

@@ -90,4 +90,3 @@ int SG(int u)
     }
     for(int i = 0; i < n; i++) if(!vis[i]) return sg[u] = i;
 }
-
